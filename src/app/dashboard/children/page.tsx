@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent,  CardHeader, CardTitle } from '@/components/ui/card'; //CardDescription,
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -34,10 +34,10 @@ import {
   EyeIcon,
   UserPlusIcon,
   CalendarIcon,
-  MapPinIcon,
+  //MapPinIcon,
   HeartIcon,
   TrendingUpIcon,
-  DownloadIcon,
+  //DownloadIcon,
   UsersIcon,
   BookOpenIcon,
   RefreshCwIcon
@@ -207,10 +207,11 @@ function FiltersCard({ filters, onFiltersChange }: FiltersCardProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Búsqueda por nombre */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Buscar por nombre</label>
+            <label htmlFor="search" className="text-sm font-medium">Buscar por nombre</label>
             <div className="relative">
               <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
+                id="search"
                 placeholder="Nombre del niño..."
                 value={filters.search || ''}
                 onChange={(e) => onFiltersChange({ ...filters, search: e.target.value })}
@@ -220,39 +221,47 @@ function FiltersCard({ filters, onFiltersChange }: FiltersCardProps) {
           </div>
 
           {/* Relación */}
-          <Select 
-            value={filters.relationship_type || 'all'} 
-            onValueChange={(value) => onFiltersChange({ 
-              ...filters, 
-              relationship_type: value === 'all' ? undefined : value as RelationshipType 
-            })}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Tipo de relación" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas las relaciones</SelectItem>
-              <SelectItem value="parent">Padre/Madre</SelectItem>
-              <SelectItem value="teacher">Docente</SelectItem>
-              <SelectItem value="specialist">Especialista</SelectItem>
-              <SelectItem value="observer">Observador</SelectItem>
-              <SelectItem value="family">Familia</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="space-y-2">
+            <label htmlFor="relationship_type" className="text-sm font-medium">Tipo de relación</label>
+            <Select
+              value={filters.relationship_type || 'all'}
+              onValueChange={(value) =>
+                onFiltersChange({
+                  ...filters,
+                  relationship_type: value === 'all' ? undefined : (value as RelationshipType),
+                })
+              }
+            >
+              <SelectTrigger id="relationship_type">
+                <SelectValue placeholder="Tipo de relación" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas las relaciones</SelectItem>
+                <SelectItem value="parent">Padre/Madre</SelectItem>
+                <SelectItem value="teacher">Docente</SelectItem>
+                <SelectItem value="specialist">Especialista</SelectItem>
+                <SelectItem value="observer">Observador</SelectItem>
+                <SelectItem value="family">Familia</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
           {/* Rango de edad */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Edad máxima</label>
+            <label htmlFor="max_age" className="text-sm font-medium">Edad máxima</label>
             <Input
+              id="max_age"
               type="number"
               placeholder="Años"
               min="0"
               max="25"
               value={filters.max_age || ''}
-              onChange={(e) => onFiltersChange({ 
-                ...filters, 
-                max_age: e.target.value ? parseInt(e.target.value) : undefined 
-              })}
+              onChange={(e) =>
+                onFiltersChange({
+                  ...filters,
+                  max_age: e.target.value ? parseInt(e.target.value) : undefined,
+                })
+              }
             />
           </div>
         </div>
@@ -260,6 +269,7 @@ function FiltersCard({ filters, onFiltersChange }: FiltersCardProps) {
     </Card>
   );
 }
+
 
 // ================================================================
 // COMPONENTE PRINCIPAL
