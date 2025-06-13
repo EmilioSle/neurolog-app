@@ -4,6 +4,15 @@
 -- Ejecutar completo en Supabase SQL Editor
 -- Borra todo y crea desde cero según últimas actualizaciones
 
+-- =============================
+-- 0. CREAR TIPOS ENUM REUTILIZABLES
+-- =============================
+CREATE TYPE user_role_enum AS ENUM ('parent', 'teacher', 'specialist', 'admin');
+CREATE TYPE relationship_enum AS ENUM ('parent', 'teacher', 'specialist', 'observer', 'family');
+CREATE TYPE intensity_enum AS ENUM ('low', 'medium', 'high');
+CREATE TYPE risk_level_enum AS ENUM ('low', 'medium', 'high', 'critical');
+-- =============================
+
 -- ================================================================
 -- 1. LIMPIAR TODO LO EXISTENTE
 -- ================================================================
@@ -46,12 +55,14 @@ DROP TABLE IF EXISTS profiles CASCADE;
 -- 2. CREAR TABLAS PRINCIPALES
 -- ================================================================
 
--- TABLA: profiles (usuarios del sistema)
+-- =============================
+-- TABLA PROFILES
+-- =============================
 CREATE TABLE profiles (
   id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
   full_name TEXT NOT NULL,
-  role TEXT CHECK (role IN ('parent', 'teacher', 'specialist', 'admin')) DEFAULT 'parent',
+  role user_role_enum DEFAULT 'parent',
   avatar_url TEXT,
   phone TEXT,
   is_active BOOLEAN DEFAULT TRUE,
@@ -106,7 +117,7 @@ CREATE TABLE user_child_relations (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
   child_id UUID REFERENCES children(id) ON DELETE CASCADE NOT NULL,
-  relationship_type TEXT CHECK (relationship_type IN ('parent', 'teacher', 'specialist', 'observer', 'family')) NOT NULL,
+  relationship_type relationship_enum NOT NULL,
   can_edit BOOLEAN DEFAULT FALSE,
   can_view BOOLEAN DEFAULT TRUE,
   can_export BOOLEAN DEFAULT FALSE,
@@ -118,7 +129,6 @@ CREATE TABLE user_child_relations (
   notes TEXT,
   notification_preferences JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  
   UNIQUE(user_id, child_id, relationship_type)
 );
 
@@ -130,7 +140,7 @@ CREATE TABLE daily_logs (
   title TEXT NOT NULL CHECK (length(trim(title)) >= 2),
   content TEXT NOT NULL,
   mood_score INTEGER CHECK (mood_score >= 1 AND mood_score <= 10),
-  intensity_level TEXT CHECK (intensity_level IN ('low', 'medium', 'high')) DEFAULT 'medium',
+  intensity_level intensity_enum DEFAULT 'medium',
   logged_by UUID REFERENCES profiles(id) NOT NULL,
   log_date DATE DEFAULT CURRENT_DATE,
   is_private BOOLEAN DEFAULT FALSE,
@@ -150,6 +160,7 @@ CREATE TABLE daily_logs (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+
 -- TABLA: audit_logs (auditoría del sistema)
 CREATE TABLE audit_logs (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -157,14 +168,14 @@ CREATE TABLE audit_logs (
   operation TEXT CHECK (operation IN ('INSERT', 'UPDATE', 'DELETE', 'SELECT')) NOT NULL,
   record_id TEXT,
   user_id UUID REFERENCES profiles(id),
-  user_role TEXT,
+  user_role user_role_enum,
   old_values JSONB,
   new_values JSONB,
   changed_fields TEXT[],
   ip_address INET,
   user_agent TEXT,
   session_id TEXT,
-  risk_level TEXT CHECK (risk_level IN ('low', 'medium', 'high', 'critical')) DEFAULT 'low',
+  risk_level risk_level_enum DEFAULT 'low',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
