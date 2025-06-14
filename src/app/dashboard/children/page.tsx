@@ -360,12 +360,12 @@ function ChildrenErrorOrEmpty({
   childrenCount,
   onReload,
   onClearFilters,
-}: {
+}: Readonly<{
   error?: string;
   childrenCount: number;
   onReload: () => void;
   onClearFilters: () => void;
-}) {
+}>) {
   if (error) {
     return (
       <Card className="border-red-200 bg-red-50">
@@ -489,52 +489,65 @@ export default function ChildrenPage() {
       <FiltersCard filters={filters} onFiltersChange={setFilters} />
 
       {/* Lista/Grid de niños */}
-      {loading ? (
-        <ChildrenLoadingSkeleton />
-        ) : error || filteredChildren.length === 0 ? (
-        <ChildrenErrorOrEmpty
-          error={error}
-          childrenCount={children.length}
-          onReload={() => window.location.reload()}
-          onClearFilters={() => setFilters({})}
-        />
-      ) : (
-        <>
-          {/* View Mode Toggle */}
-          <div className="flex justify-end">
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600">Vista:</span>
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('grid')}
-              >
-                Tarjetas
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('list')}
-              >
-                Lista
-              </Button>
-            </div>
-          </div>
+      {(() => {
+        if (loading) {
+          return <ChildrenLoadingSkeleton />;
+        }
 
-          {/* Children Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredChildren.map((child) => (
-              <ChildCard
-                key={child.id}
-                child={child}
-                onEdit={handleEdit}
-                onViewDetails={handleViewDetails}
-                onManageUsers={handleManageUsers}
-              />
-            ))}
-          </div>
-        </>
-      )}
+        const errorOrEmpty = error !== undefined && error !== null
+          ? true
+          : filteredChildren.length === 0;
+
+        const errorProp: string | undefined = error ?? undefined;
+
+        if (errorOrEmpty) {
+          return (
+            <ChildrenErrorOrEmpty
+              error={errorProp}
+              childrenCount={children.length}
+              onReload={() => window.location.reload()}
+              onClearFilters={() => setFilters({})}
+            />
+          );
+        }
+
+        return (
+          <>
+            {/* View Mode Toggle */}
+            <div className="flex justify-end">
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-600">Vista:</span>
+                <Button
+                  variant={viewMode === 'grid' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('grid')}
+                >
+                  Tarjetas
+                </Button>
+                <Button
+                  variant={viewMode === 'list' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                >
+                  Lista
+                </Button>
+              </div>
+            </div>
+            {/* Children Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredChildren.map((child) => (
+                <ChildCard
+                  key={child.id}
+                  child={child}
+                  onEdit={handleEdit}
+                  onViewDetails={handleViewDetails}
+                  onManageUsers={handleManageUsers}
+                />
+              ))}
+            </div>
+          </>
+        );
+      })()}
     </div>
   );
 }
