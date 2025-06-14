@@ -144,9 +144,9 @@ export default function ReportsPage() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="text-sm font-medium mb-2 block">Niño</label>
+              <label htmlFor="child-select" className="text-sm font-medium mb-2 block">Niño</label>
               <Select value={selectedChild} onValueChange={setSelectedChild}>
-                <SelectTrigger>
+                <SelectTrigger id="child-select">
                   <SelectValue placeholder="Seleccionar niño" />
                 </SelectTrigger>
                 <SelectContent>
@@ -159,12 +159,12 @@ export default function ReportsPage() {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <label className="text-sm font-medium mb-2 block">Período</label>
-              <DatePickerWithRange 
+              <DatePickerWithRange
                 date={dateRange}
-                onDateChange={setDateRange}
+                setDate={setDateRange}
               />
             </div>
 
@@ -185,6 +185,7 @@ export default function ReportsPage() {
           </div>
         </CardContent>
       </Card>
+
 
       {/* Métricas principales */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
