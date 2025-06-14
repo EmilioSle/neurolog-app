@@ -483,7 +483,7 @@ export default function ChildDetailPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {/* TODO: Implementar gráficos de progreso */}
+              {/* Implementar gráficos de progreso */}
               <p className="text-gray-500">Gráficos de progreso próximamente...</p>
             </CardContent>
           </Card>
